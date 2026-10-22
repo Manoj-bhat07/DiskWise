@@ -1,0 +1,23 @@
+========== DiskWise Scan Report ==========
+
+===== Scan Summary =====
+Files: 6
+Subdirectories: 1
+Total size: 21268503 bytes
+
+===== File Count by Extension =====
+.pdf : 1 files
+.txt : 2 files
+.jpg : 1 files
+.pptx : 1 files
+
+===== File Type Summary =====
+.pdf - 5821.13 KB
+.txt - 0.04 KB
+.jpg - 440.60 KB
+.pptx - 14508.26 KB
+
+===== Storage Insights =====
+Total Storage: 20.28 MB
+Most Storage Used By: .pptx
+Largest File: THERMOS (FINAL).pptx - 14856454 bytes
