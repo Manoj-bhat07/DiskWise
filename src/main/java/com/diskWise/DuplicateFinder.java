@@ -67,6 +67,7 @@ public class DuplicateFinder {
         }
     }
 
+
     private static void collectFiles(File folder, List<File> files) {
         File[] contents = folder.listFiles();
 
@@ -75,6 +76,15 @@ public class DuplicateFinder {
         }
 
         for (File file : contents) {
+
+            if (Files.isSymbolicLink(file.toPath())) {
+                System.out.println(
+                        "Skipping symbolic link: "
+                                + file.getAbsolutePath()
+                );
+                continue;
+            }
+
             if (file.isFile()) {
                 files.add(file);
             } else if (file.isDirectory()) {
@@ -82,4 +92,5 @@ public class DuplicateFinder {
             }
         }
     }
+
 }

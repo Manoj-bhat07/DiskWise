@@ -1,6 +1,8 @@
 package com.diskWise;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 
 public class Main {
@@ -8,7 +10,7 @@ public class Main {
     private static final long LARGE_FILE_THRESHOLD = 1024L * 1024L;
 
     public static void main(String[] args) {
-        String folderPath = "C:/Users/user-name/folder-path";
+        String folderPath = "C:/Users/User-Name/file - path";
         File folder = new File(folderPath);
 
         if (!folder.exists() || !folder.isDirectory()) {
@@ -179,28 +181,69 @@ public class Main {
 
         if (files == null) {
             System.out.println(
-                    "Unable to read folder contents: "
+                    "Unable to read directory "
                             + folder.getAbsolutePath()
             );
             return;
         }
 
         for (File file : files) {
-            if (file.isFile()) {
-                stats.fileCount++;
-                stats.totalSize += file.length();
-                if (stats.largestFile == null
-                        || file.length() > stats.largestFile.size) {
 
-                    stats.largestFile = new FileInfo(file);
+            if (Files.isSymbolicLink(file.toPath())) {
+                System.out.println(
+                        "Skipping symbolic link: "
+                                + file.getAbsolutePath()
+                );
+                continue;
+            }
+
+            if (file.isFile()) {
+
+                if (!file.canRead()) {
+                    System.out.println(
+                            "Warning: Cannot read file: "
+                                    + file.getAbsolutePath()
+                    );
+                    continue;
+                }
+
+                if (!file.exists()) {
+                    System.out.println(
+                            "Warning: File disappeared during scan: "
+                                    + file.getAbsolutePath()
+                    );
+                    continue;
+                }
+
+
+                long fileSize;
+
+                try {
+                    fileSize = Files.size(file.toPath());
+                } catch (IOException e) {
+                    System.out.println(
+                            "Warning: Cannot access file: "
+                                    + file.getAbsolutePath()
+                                    + " | Reason: "
+                                    + e.getMessage()
+                    );
+                    continue;
+                }
+
+                stats.fileCount++;
+                stats.totalSize += fileSize;
+                if (stats.largestFile == null
+                        || fileSize > stats.largestFile.size) {
+
+                    stats.largestFile = new FileInfo(file, fileSize);
                 }
                 System.out.println(
                         file.getAbsolutePath() + " - "
-                                + file.length() + " bytes"
+                                + fileSize + " bytes"
                 );
 
-                if (file.length() > LARGE_FILE_THRESHOLD) {
-                    stats.largeFiles.add(new FileInfo(file));
+                if (fileSize > LARGE_FILE_THRESHOLD) {
+                    stats.largeFiles.add(new FileInfo(file, fileSize));
                 }
 
                 String fileName = file.getName();
@@ -211,7 +254,7 @@ public class Main {
 
                     stats.extensionSize.put(
                             extension,
-                            stats.extensionSize.getOrDefault(extension, 0L) + file.length()
+                            stats.extensionSize.getOrDefault(extension, 0L) + fileSize
                     );
                 }
             } else if (file.isDirectory()) {

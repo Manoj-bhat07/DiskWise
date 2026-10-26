@@ -4,8 +4,8 @@ public class FileInfo {
     File file;
     long size;
 
-    FileInfo(File file) {
+    FileInfo(File file, long size) {
         this.file = file;
-        this.size = file.length();
+        this.size = size;
     }
 }

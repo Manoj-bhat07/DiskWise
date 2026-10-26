@@ -37,3 +37,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+# Ignore all IntelliJ project settings
+.idea/
+
+# Ignore generated DiskWise report
+DiskWiseReport.txt
