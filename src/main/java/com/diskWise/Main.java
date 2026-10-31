@@ -1,5 +1,7 @@
 package com.diskWise;
 
+
+import java.sql.SQLException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,7 +12,7 @@ public class Main {
     private static final long LARGE_FILE_THRESHOLD = 1024L * 1024L;
 
     public static void main(String[] args) {
-        String folderPath = "C:/Users/User-Name/file - path";
+        String folderPath = "/C://Users//user-name/ file- path//";
         File folder = new File(folderPath);
 
         if (!folder.exists() || !folder.isDirectory()) {
@@ -23,6 +25,28 @@ public class Main {
 
         System.out.println("===== DiskWise Scanner =====");
         scanFolder(folder, stats);
+
+        ScanRepository repository = new ScanRepository();
+
+        try {
+            long scanId = repository.saveScanHistory(
+                    folder.getAbsolutePath(),
+                    stats
+            );
+
+            System.out.println("Scan history saved successfully!");
+            System.out.println("Generated Scan ID: " + scanId);
+
+            int savedFiles = repository.saveScannedFiles(scanId, stats);
+
+            System.out.println("File records saved successfully!");
+            System.out.println("Total file records saved: " + savedFiles);
+
+        } catch (SQLException e) {
+            System.out.println("Database operation failed.");
+            e.printStackTrace();
+        }
+
 
         stats.largeFiles.sort(
                 (a, b) -> Long.compare(b.size, a.size)
@@ -177,6 +201,7 @@ public class Main {
     }
 
     public static void scanFolder(File folder, ScanStats stats) {
+
         File[] files = folder.listFiles();
 
         if (files == null) {
@@ -232,6 +257,7 @@ public class Main {
 
                 stats.fileCount++;
                 stats.totalSize += fileSize;
+                stats.scannedFiles.add(new FileInfo(file, fileSize));
                 if (stats.largestFile == null
                         || fileSize > stats.largestFile.size) {
 
@@ -265,6 +291,7 @@ public class Main {
                 );
 
                 scanFolder(file, stats);
+
 
                 }
             }

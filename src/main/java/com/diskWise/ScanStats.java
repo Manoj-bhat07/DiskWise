@@ -18,5 +18,7 @@ public class ScanStats {
 
     List<FileInfo> largeFiles = new ArrayList<>();
 
+    List<FileInfo> scannedFiles = new ArrayList<>();
+
     Map<String, Long> extensionSize = new HashMap<>();
 }
